@@ -8,7 +8,7 @@ import time
 
 BASE_URL = "http://localhost:8080"
 NAMESPACE = "default"                          # namespace to deploy target application using deploymnt_service
-IMAGE_NAME = "stupidImage" #"gcr.io/google-containers/pause"  # nginx
+IMAGE_NAME = "gcr.io/google-containers/pause"  # nginx
 name = IMAGE_NAME.replace(":", "-").replace("/", "-")
 POD_NAME = ("pod-" + name.lower()) if "-" not in name else name.lower()
 
