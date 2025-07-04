@@ -1,0 +1,11 @@
+
+__pycache__/
+.pytest_cache/
+*.pyc
+*.pyo
+*.pyd
+*.pyo
+*.pdb
+.vscode/
+tests/__pycache__
+port-forward.pid
