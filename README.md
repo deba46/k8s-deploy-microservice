@@ -36,22 +36,24 @@ PYTHONPATH=. pytest tests/
 ### Authentication and Authorization:
     - Only authorized users should be allowed to access the deployment endpoints.E.g Azure AD and OAuth2 tokens
     - At k8s level use k8s rbac role (clusterRole and binding), restrict to namespace level
-    - Always use dedicated service accounts for kubernetes workloads and with tightly scoped rbac permissions
-   
+    - Always use dedicated service accounts for kubernetes workloads and with tightly scoped rbac permissions 
 ### Network security
     - Use Valid TLs/SSL certificates . COnfigure microservice to use SSL 
     - Ensure single entry point to the service by using ingress controller. E.g Use of firewalls and network security with ingresses such as Azure app gateway  
-
 ### Pod security
     - Follow Pod Security Standards and best practices. E.g setup securityContext and always run as non root user
     - Scan container images for vulnerabilities. E.g Microsoft defender , Trivy etc.
     - Store sensitive information in external vaults . E.g azure keyvault
+### Application security:
+    - Scan codebase/repo and kubernetes deployments for security vulnerabilities. E.g blackduck, polaris can be used
+    - Implement this steps in devOps pipline before deploying.
 
 ## 2. Scalability
 ### Load balancing:
     - Use a load balancer such as API gateway to route requests.
     - Enable horizontal pod scaling based on cpu and memory requirements or Custom metrics with KEDA .
     - Cluster autoscaler to enable automatic add or remove of nodes
+    - Perform load testing with tools like Locust
 ### Some steps for app scalability:
     - Async communication - already implemented with kube async io lib.
     - Always create stateless application , to make autoscaling faster and easier
