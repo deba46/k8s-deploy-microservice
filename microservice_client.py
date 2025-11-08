@@ -25,7 +25,7 @@ def deploy():
     print(response.status_code, response.text)
 
 def check_status(timeout_seconds=180, interval_seconds=5):
-    """ Check status of pod , polling for 3 mins (can be adjusted later) """
+    """ Check status of pod , polling for 3 mins: test actions  """
     max_attempts = timeout_seconds // interval_seconds
     for attempt in range(max_attempts):
         try:
