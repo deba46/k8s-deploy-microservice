@@ -24,7 +24,7 @@ jobs:
       - name: Build Docker image
         run: |
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k8s-deployment-service
-          TAG=${{ github.sha }}
+          TAG=$(echo "${{ github.sha }}" | cut -c1-7)
           docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG
           echo "Built image: $IMAGE_NAME:$TAG"
 
