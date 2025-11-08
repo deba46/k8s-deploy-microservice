@@ -1,0 +1,48 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write       # Needed to push manifest changes
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
+        id: build
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k8s-deployment-service
+          TAG=${{ github.sha::7 }}
+          docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG
+          docker push $IMAGE_NAME:$TAG
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Update deployment.yaml with new image tag
+        run: |
+          DEPLOYMENT_FILE=infra-repo/k8s/deployment.yaml
+          echo "Updating $DEPLOYMENT_FILE with image tag $IMAGE_TAG"
+          sed -i "s|image: ghcr.io/.*/k8s-deployment-service:.*|image: $IMAGE_NAME:$IMAGE_TAG|g" $DEPLOYMENT_FILE
+
+      - name: Commit and push updated deployment.yaml
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add infra-repo/k8s/deployment.yaml
+          git commit -m "Update deployment image to $IMAGE_TAG [skip ci]" || echo "No changes to commit"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
