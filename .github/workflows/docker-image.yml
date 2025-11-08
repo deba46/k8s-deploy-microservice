@@ -7,12 +7,30 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+      packages: write   # Needed to push to GHCR
+
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Build Docker image
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k8s-deployment-service
+          TAG=${{ github.sha }}
+          docker build . --file Dockerfile --tag $IMAGE_NAME:$TAG
+          echo "Built image: $IMAGE_NAME:$TAG"
+
+      - name: Push Docker image
+        run: |
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/k8s-deployment-service
+          TAG=${{ github.sha }}
+          docker push $IMAGE_NAME:$TAG
+
